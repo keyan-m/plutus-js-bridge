@@ -12,11 +12,11 @@ functions for different data constructors of a sum type. Therefore, if nested
 sum types are present, the number of [sample data](#notes-on-sample-values)
 that you should provide for the application can grow exponentially.
 
-At the moment, this seems like a somewhat sufficient solution to help improve
-production code. A complete solution would probably involve auto-generation of
-all the possible variants of a datatype using Template Haskell. Also, generated
-JS functions should also conform to allow indication of data constructors to
-prevent a potentially large number of functions.
+At the moment, this seems like this package is a somewhat sufficient solution
+to help improve production code. A complete solution would probably involve
+auto-generation of all the possible variants of a datatype using Template
+Haskell. Also, generated JS functions should also conform to allow indication
+of data constructors to prevent a potentially large number of functions.
 
 Thinking aloud here, but if the JS functions end up requiring the indication of
 data constructors with, say, string literals, that would certainly reduce the
@@ -65,7 +65,33 @@ is to enter a `nix-shell` from the
 
 There are two possible paths to take from here:
 
-### 1. Using the Builtin Application to Parse JSON of Datum Values
+### 1. Importing the Library
+
+  5. Change directory to here:
+     ```bash
+     $ cd ~/plutus-browser-bridge
+     ```
+
+  6. In your `cabal.project` file, add another element to its `packages` field
+     that points to this repo's `.cabal` file, e.g.:
+     ```
+     packages:   myPlutusProject.cabal
+               , ../plutus-browser-bridge/plutus-browser-bridge.cabal
+     ```
+
+  7. Add `plutus-browser-bridge` to your project's `build-depends` in its
+     cabal file.
+
+  8. Import the `PlutusBridge` module into one of your applications, and call
+     `PlutusBridge.run` in its `main`. This function expects the output file,
+     and a list of tuples—a mapping from the target Javascript function name
+     to a sample value of your custom datum/redeemer.  Refer to the
+     [notes below](#notes-on-sample-values) for details about sample values.
+
+     Note that you should have `OverloadedString` extension activated in this
+     `main.hs` file.
+
+### 2. Using the Builtin Application to Parse JSON of Datum Values
 
   5. You should already have a scheme in place for generating your custom
      datum/redeemer values as JSON files (using the `cardano-api` library).
@@ -86,27 +112,6 @@ There are two possible paths to take from here:
      of JSON files, where their filenames are used as the names of their
      repective generated functions. For instance, `path/to/makeDatum1.json`
      would result in a function named `makeDatum1` in Javascript.
-
-### 2. Installing the Library
-
-  5. Change directory to here:
-     ```bash
-     $ cd ~/plutus-browser-bridge
-     ```
-
-  6. Install this library into your Plutus project:
-     ```bash
-     $ cabal install /path/to/your/project
-     ```
-
-  7. Import the `PlutusBridge` module into one of your applications, and call
-     `PlutusBridge.run` in its `main`. This function expects the output file,
-     and a list of tuples—a mapping from the resulting Javascript function name
-     to a sample value of your custom datum/redeemer.  Refer to the
-     [notes below](#notes-on-sample-values) for details about sample values.
-
-     Note that you should have `OverloadedString` extension activated in this
-     `main.hs` file.
 
 
 ## Notes on Sample Values
@@ -180,7 +185,7 @@ build pipeline.
 For the JSON approach, you'll also need to preface the execution of this
 application with your other application that generates sample JSON files.
 
-As a simple example with `npm`, you can edit the `start` script form
+As a simple example with `npm`, you can edit the `start` script from
 `package.json` to include the executable that generates sample JSON files,
 followed by `plutus-bridge-app` with appropriate arguments:
 ```bash

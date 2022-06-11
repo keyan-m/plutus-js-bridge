@@ -89,6 +89,7 @@ main =
         ++ "\n\n"
         -- }}}
       -- }}}
+    {-
     fileName : jsFiles -> do
       -- {{{
       eitherSDs <- forM jsFiles (\jsFile -> (takeBaseName jsFile,) <$> parseJSON jsFile)
@@ -120,3 +121,4 @@ main =
       sampleDataList <- foldM foldFn [] eitherSDs
       generateModule fileName sampleDataList
       -- }}}
+    -}
