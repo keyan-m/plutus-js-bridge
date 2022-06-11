@@ -1,16 +1,16 @@
-function data_byteString(bsStr) {
+export function data_byteString(bsStr) {
   // {{{
   return PlutusData.new_bytes(Buffer.from(bsStr, 'hex'));
   // }}}
 }
 
-function data_integer(intStr) {
+export function data_integer(intStr) {
   // {{{
   return PlutusData.new_integer(BigInt.from_str(intStr));
   // }}}
 }
 
-function data_list(plutusDataVals) {
+export function data_list(plutusDataVals) {
   // {{{
   let theList = PlutusList.new();
   plutusDataVals.forEach(pd => theList.add(pd));
@@ -18,7 +18,7 @@ function data_list(plutusDataVals) {
   // }}}
 }
 
-function data_map(plutusDataPairs) {
+export function data_map(plutusDataPairs) {
   // {{{
   let theMap = PlutusMap.new();
   plutusDataPairs.forEach(
@@ -28,7 +28,7 @@ function data_map(plutusDataPairs) {
   // }}}
 }
 
-function data_constr(indexStr, plutusDataVals) {
+export function data_constr(indexStr, plutusDataVals) {
   // {{{
   let theList = PlutusList.new();
   plutusDataVals.forEach(pd =>

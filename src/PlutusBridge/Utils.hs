@@ -225,7 +225,7 @@ parseJSON file = do
 
 
 generateFunction :: ByteString -> Data -> ByteString
-generateFunction fnName = snd . fromData fnName
+generateFunction fnName = ("export " <>) . snd . fromData fnName
 
 
 functionFromSD :: SampleData -> ByteString
