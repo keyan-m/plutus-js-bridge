@@ -17,7 +17,7 @@ import           Data.String             (fromString)
 import qualified Data.Text               as T
 import           Data.Text               (Text)
 import qualified PlutusTx
-import           PlutusTx                (FromData, ToData, Data (..), toData)
+import           PlutusTx                (ToData, Data (..), toData)
 import qualified PlutusBridge.SampleData as SD
 import           PlutusBridge.SampleData (SampleData)
 
@@ -204,7 +204,7 @@ fromData fnName dat =
   -- }}}
 
 
-parseJSON :: FromData a => FilePath -> IO (Either Text a)
+parseJSON :: FilePath -> IO (Either Text Data)
 parseJSON file = do
   -- {{{
   fileContent <- LBS.readFile file
@@ -212,11 +212,7 @@ parseJSON file = do
     Just decoded ->
       case scriptDataFromJson ScriptDataJsonDetailedSchema decoded of
         Right scriptData ->
-          case PlutusTx.fromData (scriptDataToData scriptData) of
-            Just finalData ->
-              return $ Right finalData
-            Nothing        ->
-              return $ Left "Bad format."
+          return $ Right (scriptDataToData scriptData)
         Left err ->
           return $ Left $ T.pack $ show err
     Nothing ->
@@ -239,6 +235,7 @@ functionsFromSDs = foldr (\sd acc -> functionFromSD sd <> acc) BS.empty
 generateModule :: FilePath -> [SampleData] -> IO ()
 generateModule file =
   BS.writeFile file . functionsFromSDs
+
 
 
 

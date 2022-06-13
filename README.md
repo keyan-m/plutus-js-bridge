@@ -1,35 +1,29 @@
-# Plutus Browser Bridge
+# Plutus JavaScript Bridge
 
 A Haskell package and CLI application to help guarantee identical
-datum/redeemer creation in the browser such that they match your on-chain
+datum/redeemer creation in JavaScript such that they match your on-chain
 datatypes.
 
 
 ## Limitation
 
-With this package, it'd typically be sensible to generate separate Javascript
-functions for different data constructors of a sum type. Therefore, if nested
-sum types are present, the number of [sample data](#notes-on-sample-values)
-that you should provide for the application can grow exponentially.
+Since Haskell's sum types don't have simple representations in Javascript, a
+separate function should be generated for each data constructor of a sum type.
+Therefore, if nested sum types are present, the number of
+[sample values](#notes-on-sample-values) that you should provide for the
+application can grow exponentially.
 
-At the moment, this seems like this package is a somewhat sufficient solution
-to help improve production code. A complete solution would probably involve
-auto-generation of all the possible variants of a datatype using Template
-Haskell. Also, generated JS functions should also conform to allow indication
-of data constructors to prevent a potentially large number of functions.
-
-Thinking aloud here, but if the JS functions end up requiring the indication of
-data constructors with, say, string literals, that would certainly reduce the
-number of generated functions. But on the other hand, would make the code prone
-to typos and similar faults.
+Solving this limitation would require a "constructor selection" scheme, e.g.
+identifying the intended constructor with an extra argument in the generated
+function. This extra argument can be a string literal that matches the data
+constructor from Haskell. This, however, is prone to typos and similar faults.
 
 
 ## Primitive Helper Functions
 
-The generated functions using this package rely upon a few primitive helper
-functions defined in `js/helpers.js`. Make sure to account for their inclusion
-in your bundling pipeline such that the generated functions have access to
-them.
+Generated functions from this package rely upon a few helper functions defined
+in `js/helpers.js`. Make sure to account for their inclusion in your bundling
+pipeline such that the generated functions have access to them.
 
 
 ## Generating JS Functions
@@ -51,7 +45,7 @@ is to enter a `nix-shell` from the
 
   3. Enter this repo:
      ```bash
-     $ cd ~/plutus-browser-bridge
+     $ cd ~/plutus-js-bridge
      ```
 
   4. (Optional) It is very likely that you already have a `dist-newstyle`
@@ -60,31 +54,26 @@ is to enter a `nix-shell` from the
      You can utilize a symlink from your project to prevent redownloding and
      rebuilding those dependencies:
      ```bash
-     $ ln -s ~/path/to/my/plutus/project/dist-newstyle ~/plutus-browser-bridge/dist-newstyle
+     $ ln -s ~/path/to/my/plutus/project/dist-newstyle ~/plutus-js-bridge/dist-newstyle
      ```
 
 There are two possible paths to take from here:
 
 ### 1. Importing the Library
 
-  5. Change directory to here:
-     ```bash
-     $ cd ~/plutus-browser-bridge
-     ```
-
-  6. In your `cabal.project` file, add another element to its `packages` field
+  5. In your `cabal.project` file, add another element to its `packages` field
      that points to this repo's `.cabal` file, e.g.:
      ```
      packages:   myPlutusProject.cabal
-               , ../plutus-browser-bridge/plutus-browser-bridge.cabal
+               , ../plutus-js-bridge/plutus-js-bridge.cabal
      ```
 
-  7. Add `plutus-browser-bridge` to your project's `build-depends` in its
+  6. Add `plutus-js-bridge` to your project's `build-depends` in its
      cabal file.
 
-  8. Import the `PlutusBridge` module into one of your applications, and call
+  7. Import the `PlutusBridge` module into one of your applications, and call
      `PlutusBridge.run` in its `main`. This function expects the output file,
-     and a list of tuples—a mapping from the target Javascript function name
+     and a list of tuples—a mapping from the target JavaScript function name
      to a sample value of your custom datum/redeemer.  Refer to the
      [notes below](#notes-on-sample-values) for details about sample values.
 
@@ -108,10 +97,10 @@ There are two possible paths to take from here:
      $ cabal run plutus-bridge-app -- outputFile.js makeDatum1.json makeDatum2.json
      ```
 
-     The expected arguments are the output Javascript file, followed by a list
+     The expected arguments are the output JavaScript file, followed by a list
      of JSON files, where their filenames are used as the names of their
      repective generated functions. For instance, `path/to/makeDatum1.json`
-     would result in a function named `makeDatum1` in Javascript.
+     would result in a function named `makeDatum1` in JavaScript.
 
 
 ## Notes on Sample Values
@@ -122,13 +111,11 @@ a list, make sure that you provide at least one element inside it. The values
 themselves don't matter, they are only used to figure out the structure.
 
 Another thing to note, is that while Haskell's record types can map to
-Javascript arrays (_where ordering matters_), sum types can be viewed as
-"branching points" since they can't be converted to simple Javascript
+JavaScript arrays (_where ordering matters_), sum types can be viewed as
+"branching points" since they can't be converted to simple JavaScript
 constructs. Therefore a separate function should be generated for every
 combination of present sum types. Which is why nested sum types can lead to an
 exponential growth in the number of generated functions.
-
-[This limitation may be resolved in future updates](#limitation).
 
 
 ## Using the Generated JS Functions
