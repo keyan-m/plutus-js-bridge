@@ -129,11 +129,11 @@ JavaScript. We just saw that a value of a record type in Haskell can be
 constructed without specifying the field handles, and simply by respecting the
 order of the fields. This means that JavaScript's arrays can be good candidates
 to represent a record type. So for example, a record type with 3 fields can be
-represented by a 3 element array in JavaScript.
+represented by a 3-element array in JavaScript.
 
-On the other hand, however, a Haskell sum type does not have a simple
-equivalent in JavaScript. Let's demonstrate this with another common Haskell
-sum type, `Maybe`:
+On the other hand, a Haskell sum type does not have a simple equivalent in
+JavaScript. Let's demonstrate this with another common Haskell sum type,
+`Maybe`:
 ```hs
 data Maybe a
   = Nothing
@@ -141,9 +141,9 @@ data Maybe a
 ```
 
 As an example, a `Maybe Integer` can either be `Nothing`, or `Just 42` (or any
-other number of course). To define this datatype in JavaScript, you should
-either define a custom object, or somehow resort to string literals. In other
-words, there is no simple construct suited for this representation.
+other number). To define this datatype in JavaScript, you should either define
+a custom object, or somehow resort to string literals. In other words, there is
+no simple construct suited for this representation.
 
 What you can do, is to define seperate constructor functions for each variant:
 ```js
@@ -185,9 +185,9 @@ You can see how the number of generated functions can grow rapidly with nesting
 of sum types. This is the limitation that requires your careful data modeling.
 
 There are of course other frameworks available for JavaScript that are capable
-of representing sum types (PureScript, Elm, etc.). But this tool aims bridging
-for pure JavaScript mapping. I don't think that this is an unsolvable
-limitation. So hopefully, this will be addressed in future updates.
+of representing sum types (PureScript, Elm, etc.). But this tool aims to allow
+bridging for pure JavaScript. This does not seem to be an unsolvable
+limitation. So hopefully, it will be addressed in future updates.
 
 [//]: # (}}})
 
@@ -199,7 +199,7 @@ limitation. So hopefully, this will be addressed in future updates.
 [//]: # ({{{)
 
 Fastest and simplest way to generate JavaScript functions is to use the Haskell
-package in this repo.
+package in this repository.
 
 
 ### Prerequisites
@@ -213,8 +213,9 @@ Generated functions from this tool require two things:
 - [Emurgo's serialization library](https://github.com/Emurgo/cardano-serialization-lib),
 - and a set of helper functions defined in `js/helpers.js`.
 
-You can learn more about the `PlutusData` object from the serialization library
-through [its docs](https://input-output-hk.github.io/cardano-js-sdk/classes/_cardano_sdk_core.CSL.PlutusData.html).
+You can learn more about the `PlutusData` object (which is the object returned
+by the generated functions) from the serialization library through
+[its docs](https://input-output-hk.github.io/cardano-js-sdk/classes/_cardano_sdk_core.CSL.PlutusData.html).
 
 [//]: # (}}})
 
@@ -229,7 +230,7 @@ through [its docs](https://input-output-hk.github.io/cardano-js-sdk/classes/_car
    $ git clone https://github.com/input-output-hk/plutus-apps.git
    ```
 
-2. Clone this repository, preferably next to your own project:
+2. Clone this bridge repository, preferably next to your own project:
    ```bash
    $ git clone https://github.com/snapbrillia/plutus-js-bridge.git
    ```
@@ -261,7 +262,7 @@ through [its docs](https://input-output-hk.github.io/cardano-js-sdk/classes/_car
    `executable`stanza:
    ```haskell
    executable your-plutus-project-bridge-app
-     main-is:              bridge.hs -- <-- change the file name if you already have one named as such,
+     main-is:              bridge.hs -- <-- Change the file name if you already have one named as such,
      hs-source-dirs:       app       -- <-- and note that you should have this folder.
      build-depends:        base >= 4.9 && < 5
                          , plutus-js-bridge
@@ -282,9 +283,9 @@ through [its docs](https://input-output-hk.github.io/cardano-js-sdk/classes/_car
    main :: IO ()
    main = do
      PlutusBridge.run
-       "js/datums.js"   -- output file containing the generated functions.
-       [ ( "makeDatumA" -- name of the function that creates a datum structures as `Datum1 42`.
-         , DatumA 42    -- a sample value to help the generator deduce its structure.
+       "js/datums.js"   -- <-- Output file containing the generated functions.
+       [ ( "makeDatumA" -- <-- Name of the function that creates a datum structures as `Datum1 42`.
+         , DatumA 42    -- <-- A sample value to help the generator deduce its structure.
          )
        , ( "makeDatumB"
          , DatumB "hello"
@@ -317,17 +318,17 @@ through [its docs](https://input-output-hk.github.io/cardano-js-sdk/classes/_car
    `your-plutus-project-bridge-app` is the name we defined in 
    `your-plutus-project.cabal` file's `executable` stanza.
 
-You now should have two generated JavaScript files: `js/datums.js` and
+You should have two generated JavaScript files now: `js/datums.js` and
 `js/redeemers.js`.
 
 `js/datums.js` looks like this:
 ```js
-export makeDatumA(...){...}
-export makeDatumB(...){...}
+export function makeDatumA(...){...}
+export function makeDatumB(...){...}
 ```
 
-So you can now simply import `makeDatumA` and `makeDatumB` in your frontend
-application.
+Now you can import the generated functions into your frontend application via
+these files.
 
 [//]: # (}}})
 
@@ -476,8 +477,8 @@ for the serialization library.
    $ cabal install plutus-bridge-app
    ```
 
-4. The application expects the output JavaScript file as its first argument,
-   followed by its reference JSON files for function generation:
+4. The application expects path of the output JavaScript file as its first
+   argument, followed by its reference JSON files for function generation:
    ```bash
    $ plutus-bridge-app js/datums.js json/makeDatumA.json json/makeDatumB.json
    ```
@@ -485,7 +486,7 @@ for the serialization library.
    Note that the names of the JSON files are used as the names of the generated
    functions.
 
-   So in the example above, `js/datums.js` will have such a content:
+   So in the example above, `js/datums.js` will have such contents:
    ```js
    export function makeDatumA(...){...}
    export function makeDatumB(...){...}
